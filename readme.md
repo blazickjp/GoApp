@@ -1,6 +1,3 @@
-# Creating the README.md content in Markdown format
-
-readme_content = '''
 # 🚀 Python Error Collector for LLMs 🚀
 
 Hello there, adventurous coder! 😎 Are you tired of those pesky Python errors ruining your day? 
@@ -10,10 +7,15 @@ Well, guess what? Your wish has just come true! 🌈
 ## 🌟 Features
 
 - **Real-Time Error Capturing**: Automatically captures Python errors as they happen. 🐞
-- **Codebase Snapshots**: Takes a snapshot of the relevant code files. 📸
+- **Codebase Snapshots**: Takes a snapshot of the relevant code files and saves them in a user-specific directory. 📸
 - **Shell Flexibility**: Works with both Bash and Zsh. 🐚
 - **Systray Integration**: A handy systray menu for quick interactions. 🍱
-  
+
+## 📍 Where Does It Save the Files?
+
+- On macOS: The snapshot and error files get saved to `~/Library/Application Support/PythonCapture`.
+- On Windows: The files will be saved in a corresponding AppData folder.
+
 ## 🛠 Installation
 
 1. Clone this repository:
@@ -59,6 +61,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 🎉 Final Words
 
 Happy coding! May your Python scripts be ever error-free and your LLMs ever smarter! 🥳
-'''
-
-readme_content
