@@ -54,7 +54,7 @@ func onReady() {
         case <-mSetAlias.ClickedCh:
             // Logic to set the alias
             // For demonstration, using a shell command
-            cmd := exec.Command("bash", "-c", fmt.Sprintf(`echo 'alias %s="%s"' >> ~/.%s`, "py", exePath, shellType))
+            cmd := exec.Command("bash", "-c", fmt.Sprintf(`echo 'alias %s="%s %s"' >> ~/.%s`, "py", exePath, "runApp",  shellType))
             cmd.Run()
 		case <-mRemoveAlias.ClickedCh:  // New block
             cmd := exec.Command("bash", "-c", fmt.Sprintf(`sed -i '' '/alias %s/d' ~/.%s`, "py", shellType))

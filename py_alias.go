@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"os/user"
 	"path/filepath"
+	"runtime"
 
 	"github.com/google/uuid"
 )
@@ -14,20 +16,48 @@ import (
 // 	return time.Now().Format("20060102-150405")
 // }
 
-
 func snapshotDirectory(prog_error string, uuid string) error {
+	var appDataDir string
+	usr, err := user.Current()
+    if err != nil {
+		fmt.Print("Error getting user directory:", err)
+    }
+
+	fmt.Println("User directory:", usr.HomeDir)
+	fmt.Println("OS:", runtime.GOOS)
+
+    if runtime.GOOS == "windows" {
+        appDataDir = usr.HomeDir + "\\AppData\\Local\\PythonCapture"
+    } else if runtime.GOOS == "darwin" { // macOS
+        appDataDir = usr.HomeDir + "/Library/Application Support/PythonCapture"
+    } else {
+        // Handle other OS if needed
+        appDataDir = usr.HomeDir + "/.PythonCapture" // Fallback to home directory
+    }
+
+	// Ensure the directory exists
+	err = os.MkdirAll(appDataDir, os.ModePerm)
+	if err != nil {
+		fmt.Println("Error creating directory:", err)
+		return err
+	}
+
 	// Create or open the snapshot text file
-	snapshotFile, err := os.Create(uuid + "_context.txt")
+	snapshotFilePath := filepath.Join(appDataDir, uuid+"_context.txt")
+	errorFilePath := filepath.Join(appDataDir, uuid+"_error.txt")
+	snapshotFile, err := os.Create(snapshotFilePath)
 	if err != nil {
 		fmt.Println("Error creating snapshot file:", err)
 		return err
 	}
-	errorFile, err := os.Create(uuid + "_error.txt")
+	errorFile, err := os.Create(errorFilePath)
 	if err != nil {
 		fmt.Println("Error creating error file:", err)
 		return err
 	}
 	defer snapshotFile.Close()
+	defer errorFile.Close()
+
 
 	// Walk through all files in the directory
 	filepath.Walk("./", func(path string, info os.FileInfo, err error) error {
@@ -98,6 +128,7 @@ func runApp(args []string) {
 	fullOutput := stdout.String()
 	fmt.Print(fullOutput)
 	fmt.Fprint(os.Stderr, stderr.String())
+	fmt.Printf("👍\n")
 
 	// Check if the Python script ran successfully
 	if err != nil {
