@@ -54,27 +54,21 @@ func onReady() {
         case <-mSetAlias.ClickedCh:
             // Logic to set the alias
             // For demonstration, using a shell command
-            cmd := exec.Command("bash", "-c", fmt.Sprintf(`echo 'alias %s="%s %s"' >> ~/.%s`, "py", exePath, "runApp",  shellType))
-            cmd.Run()
+			cmd := exec.Command("bash", "-c", fmt.Sprintf(`sed -i '' '/alias %s/d' ~/%s`, ".py", shellType))
+			cmd.Run()
+            cmd2 := exec.Command("bash", "-c", fmt.Sprintf(`echo 'alias %s="%s runApp"' >> ~/%s`, ".py", exePath, shellType))
+            cmd2.Run()
 		case <-mRemoveAlias.ClickedCh:  // New block
-            cmd := exec.Command("bash", "-c", fmt.Sprintf(`sed -i '' '/alias %s/d' ~/.%s`, "py", shellType))
-            cmd.Run()
+			cmd := exec.Command("bash", "-c", fmt.Sprintf(`sed -i '' '/alias %s/d' ~/%s`, ".py", shellType))
+			cmd.Run()
 		case <-mQuit.ClickedCh:
-			err := os.Remove("/tmp/my_app.lock")
-			if err != nil {
-				fmt.Println("Error removing lock file:", err)
-			}
 			systray.Quit()
 			return
 		}
-		fmt.Print("Waiting for user input\n")
 	}
 }
 
 func main() {
-	onExit := func() {
-		os.Remove("/tmp/my_app.lock")
-	}
 	// Create and load plist only if it doesn't exist
 	plistPath := "~/Library/LaunchAgents/com.yourcompany.yourapp.plist"
 	if _, err := os.Stat(plistPath); os.IsNotExist(err) {
@@ -84,20 +78,12 @@ func main() {
 			return
 		}
 	}	
-	// lockFilePath := "/tmp/my_app.lock"
-	// lockFile, err := os.OpenFile(lockFilePath, os.O_CREATE|os.O_EXCL, 0644)
-	// if err != nil {
-	// 	fmt.Println("Another instance is already running.")
-	// 	return
-	// }
-	// defer os.Remove(lockFilePath)
-	// defer lockFile.Close()
 	if len(os.Args) > 1 && os.Args[1] == "runApp" {
 		// Remove the "runApp" argument and pass the rest to runApp
 		runApp(os.Args[2:])
 		return
 	} else {
-		systray.Run(onReady, onExit)
+		systray.Run(onReady, nil)
 	}
 
 }
